@@ -1,0 +1,27 @@
+[
+        {'path_info': '/'}
+    ,   {'path_info': '/food/', 'title': 'Food'}   
+    ,   {'path_info': '/food/sandwich/', 'title': 'Sandwich'}
+    ,   {'path_info': '/food/gerkin/', 'title': 'Gerkin'}   
+    ,   {'path_info': '/food/taffy/', 'title': 'Laffy Taffy'}  
+    ,   {'path_info': '/food/pie/', 'title': 'Pie'}
+    ,   {'path_info': '/afterlife/', 'title': 'Where are you going?'}
+    ,   {'path_info': '/afterlife/heaven/', 'title': 'Heaven'}
+    ,   {'path_info': '/afterlife/hell/', 'title': 'Hell'}
+    ,   {'path_info': '/afterlife/purgatory/', 'title': 'Purgatory'}
+    ,   {'path_info': '/afterlife/reincarnation', 'title': 'Reincarnation'}
+    ,   {'path_info': '/afterlife/other/', 'title': 'Other'}
+    ,   {'path_info': '/person/',   'title': 'Person'}
+    ,   {'path_info': '/person/harry/',   'title': 'Harry'}
+    ,   {'path_info': '/person/sally/',   'title': 'Sally'}
+    ,   {'path_info': '/person/bender/',   'title': 'Bender'}
+    ,   {'path_info': '/person/ralpho/',   'title': 'Ralph'}
+    ,   {'path_info': '/caves/', 'title': 'Caves'}
+    ,   {'path_info': '/caves/copperhead/', 'title': 'Copperhead'}
+    ,   {'path_info': '/caves/con/', 'title': 'Con'}
+    ,   {'path_info': '/caves/hillside_bone/', 'title': 'Hillside Bone'}
+    ,   {'path_info': '/caves/lemonhole/', 'title': 'Lemonhole'}
+    ,   {'path_info': '/caves/bear/', 'title': 'Bear'}
+    ,   {'path_info': '/caves/coon/', 'title': 'Coon'}
+]
+
