@@ -18,28 +18,14 @@ function run_tests () {
     test('Everything seems ok so far', function(){
         expect(1);
         stop();
-        $.getJSON('/fmr/_design/couchapp_fmr/_view/by_path?key=["898feea90e55a22d66954a95c153f6da"]',function(data){
+        $.getJSON('/fmr/_design/couchapp_fmr/_view/by_path?key="006e34bb9218f22d92db682f06f2852d"',function(data){
             start();
             t = new Thread(data.rows);
             console.log(t);
             ok(t, 'we have a Thread object');
+            
+            t.render();
         })
     });
 }
 
-sitemap_data = [
-        {'path_info': '/'}
-    ,   {'path_info': '/i/am/an/orphan/i/get/stuck/on/root'}
-    ,   {'path_info': '/a/'}
-    ,   {'path_info': '/a/a.png'}
-    ,   {'path_info': '/b/'}
-    ,   {'path_info': '/b/bb/'}
-    ,   {'path_info': '/b/bb/bbb.png'}
-    ,   {'path_info': '/b/bb/bbb.jpg'}
-    ,   {'path_info': '/b/bb/bbb.gif'}
-    ,   {'path_info': '/c/'}
-    ,   {'path_info': '/c/cc/'}
-    ,   {'path_info': '/c/cc/ccc/'}
-    ,   {'path_info': '/c/cc/ccc/cccc/'}
-    ,   {'path_info': '/c/cc/ccc/cccc/cccc.png'}
-]

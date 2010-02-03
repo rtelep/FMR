@@ -5,7 +5,7 @@ import couchdb
 
 # This script takes a json dump from legacy FMR and inserts the data into couchdb.
 
-fn = 'data.json'
+fn = '/home/user/www/fmr_db_backup/data.json'
 data = json.load(open(fn))
 
 server = couchdb.Server('http://localhost:5984/')
