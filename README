@@ -1,0 +1,8 @@
+Flanderous Music Repository
+
+Using Couchapp [http://github.com/couchapp/couchapp]
+
+$ couchapp push fmr
+$ python etc/load_test_data.py
+
+http://localhost:5984/fmr/_design/couchapp_fmr/_list/posts/threads
