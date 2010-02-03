@@ -1,6 +1,6 @@
 /**
  * @fileoverview  Model a thread
- * @requires helpers/fmr.js
+ * @requires _attachment/fmrJS/fmr.js
  */
 
 function Thread(docs){
