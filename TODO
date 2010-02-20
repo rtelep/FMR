@@ -5,3 +5,8 @@ legacy fmr
 Attachments
 
 A class for top-level posts, as for a thread?  for use in /list/posts.js
+
+tab to login button
+validation on login form, missing fields
+stop popup login from couch on failed post to _session
+validation on post_form.  req. title.

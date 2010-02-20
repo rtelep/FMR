@@ -1,3 +1,3 @@
 settings = {
-        root: '/fmr/_design/couchapp_fmr'
+        root: '/a/_design/fmr'
 }
