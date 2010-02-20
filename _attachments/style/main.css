@@ -1,0 +1,50 @@
+BODY {
+    padding: 50px;
+}
+A {
+    font-weight:700;
+    color: #343A3B;
+    text-decoration:none;
+}
+A:hover {
+    color: #3b2e29;
+}
+#session {
+    margin-bottom: 30px;
+    text-align: right;
+}
+#session IMG {
+    height:20px;
+    border: none;
+}
+#session FORM {
+    display: inline;
+}
+#session INPUT {
+    width: 75px;
+    height: 15px;
+}
+#post, #logout, #login {
+    cursor: pointer;
+}
+
+.author {
+    font-size: .8em;
+}
+.title {
+    font-size: 1.2em;
+}
+
+/* index */
+.row {
+    padding: 10px;
+    border-bottom: dotted 1px #B2BFC2;
+    margin-bottom: 25px;
+}
+
+/* doc in a threaded view */
+.doc, #preview{
+    padding: 25px;
+    margin-bottom: 10px;
+    border: solid 1px #C8DADE;
+}

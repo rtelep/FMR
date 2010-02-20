@@ -29,12 +29,27 @@ function get_body(doc){
     }
 }
 
+function get_path_string(doc){
+    // comma-separated _id string
+    return doc.path.join(',');
+}
+
+function get_path_from_str(str){
+    // array from comma-separated str.
+    return str.split(',');
+}
+
+function get_path_str_from_parent_obj(obj){
+    // Given a parent doc div, return a path str for a child
+    return obj.attr('path')?obj.attr('path')+','+obj.attr('id'):obj.attr('id');
+}
+
 /**
  * Sorting
  */
 
 function sort_rows_by_date_newest_first(row_a, row_b){
-    if (row_a.value.ts_created > row_b.value.ts_created) {
+    if (row_a.value.date > row_b.value.date) {
         return 1
     } else {
         return -1
@@ -42,7 +57,7 @@ function sort_rows_by_date_newest_first(row_a, row_b){
 }
 
 function sort_rows_by_date_oldest_first(row_a, row_b){
-    if (row_a.value.ts_created > row_b.value.ts_created) {
+    if (row_a.value.date > row_b.value.date) {
         return -1
     } else {
         return 1

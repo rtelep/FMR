@@ -1,17 +1,20 @@
 /**
  * Show Function
- *  show a Post, use templates/post.html
+ *  This isn't being used anywhere.
  */
 
 function(doc, req) {
+    // !code _attachments/settings.js
     // !code helpers/template.js
-    // !json templates.post
+    // !json templates.doc
     if (doc) {
-        return template(templates.post, {
+        return template(templates.doc, {
                 author: doc.author
+            ,   id:  doc._id
             ,   title:  doc.title
             ,   body: doc.body
             ,   path: doc.path
+            ,   root: settings.root
         });
     } else {
         return "not found";

@@ -13,7 +13,7 @@
 // Usage: The passed in function is called when the page is ready.
 // CouchApp passes in the app object, which takes care of linking to 
 // the proper database, and provides access to the CouchApp helpers.
-// $.CouchApp(function(app) {
+// $.couch.app(function(app) {
 //    app.db.view(...)
 //    ...
 // });
@@ -41,7 +41,7 @@
 
   var login;
   
-  function init(app) {
+  $.couch.app = $.couch.app || function(appFun) {
     $(function() {
       var dbname = document.location.href.split('/')[3];
       var dname = unescape(document.location.href).split('/')[5];
@@ -57,12 +57,11 @@
         // turn the form into deep json
         // field names like 'author-email' get turned into json like
         // {"author":{"email":"quentin@example.com"}}
-        // Note: Fields not found in form are ignored.
         function formToDeepJSON(form, fields, doc) {
           var form = $(form);
-          fields.forEach(function(field) {
-            var elem = form.find("[name="+field+"]");
-            if (!elem) return;
+          opts.fields.forEach(function(field) {
+            var val = form.find("[name="+field+"]").val()
+            if (!val) return;
             var parts = field.split('-');
             var frontObj = doc, frontName = parts.shift();
             while (parts.length > 0) {
@@ -70,7 +69,7 @@
               frontObj = frontObj[frontName];
               frontName = parts.shift();
             }
-            frontObj[frontName] = elem.val();
+            frontObj[frontName] = val;
           });
         };
         
@@ -95,7 +94,7 @@
           // fills in forms
           opts.fields.forEach(function(field) {
             var parts = field.split('-');
-            var frontObj = doc, frontName = parts.shift();
+            var run = true, frontObj = doc, frontName = parts.shift();
             while (frontObj && parts.length > 0) {                
               frontObj = frontObj[frontName];
               frontName = parts.shift();
@@ -137,6 +136,8 @@
       		diff = (((new Date()).getTime() - date.getTime()) / 1000),
       		day_diff = Math.floor(diff / 86400);
 
+        // if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) return;
+
       	return day_diff < 1 && (
       			diff < 60 && "just now" ||
       			diff < 120 && "1 minute ago" ||
@@ -150,7 +151,7 @@
       		Math.ceil( day_diff / 365 ) + " years ago";
       };
       
-      app({
+      var appExports = $.extend({
         showPath : function(funcname, docid) {
           // I wish this was shared with path.js...
           return '/'+[dbname, '_design', dname, '_show', funcname, docid].join('/')
@@ -190,10 +191,11 @@
         view : design.view,
         docForm : docForm,
         prettyDate : prettyDate
-      });
+      }, $.couch.app.app);
+    appFun(appExports)
+      
     });
   };
-
-  $.CouchApp = $.CouchApp || init;
-
+  // legacy support. $.CouchApp is deprecated, please use $.couch.app
+  $.CouchApp = $.couch.app;
 })(jQuery);

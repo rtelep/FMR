@@ -29,12 +29,12 @@ function Thread(rows){
         var doc = Thread.docs[i];
         for (var n in doc.path){
             _id = doc.path[n];
+            if (! _id){continue};
             indexed_path.push(Thread.id_to_index[_id]);
         }
-        // Also add the index of this doc's id
         indexed_path.push(Thread.id_to_index[doc._id]);
         doc['indexed_path'] = indexed_path;
-        doc['indentation'] = doc.indexed_path.length;
+        doc['indentation'] = doc.indexed_path.length - 1;
     }
 
 
@@ -44,14 +44,5 @@ function Thread(rows){
     return true;
 }
 
-
-function array_contains(item, l){
-    for (var i in l){
-        if (l[i] == item){
-            return true
-        }
-    }
-    return false
-}
 
 

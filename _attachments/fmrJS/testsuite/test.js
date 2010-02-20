@@ -18,13 +18,12 @@ function run_tests () {
     test('Everything seems ok so far', function(){
         expect(1);
         stop();
-        $.getJSON('/fmr/_design/couchapp_fmr/_view/by_path?key="006e34bb9218f22d92db682f06f2852d"',function(data){
+        $.getJSON('/fmr/_design/couchapp_fmr/fmrJS/testsuite/test.json',function(data){
             start();
-            t = new Thread(data.rows);
+            t = new Thread(data);
             console.log(t);
             ok(t, 'we have a Thread object');
             
-            t.render();
         })
     });
 }

@@ -1,27 +1,58 @@
 [
-        {'path_info': '/'}
-    ,   {'path_info': '/food/', 'title': 'Food'}   
-    ,   {'path_info': '/food/sandwich/', 'title': 'Sandwich'}
-    ,   {'path_info': '/food/gerkin/', 'title': 'Gerkin'}   
-    ,   {'path_info': '/food/taffy/', 'title': 'Laffy Taffy'}  
-    ,   {'path_info': '/food/pie/', 'title': 'Pie'}
-    ,   {'path_info': '/afterlife/', 'title': 'Where are you going?'}
-    ,   {'path_info': '/afterlife/heaven/', 'title': 'Heaven'}
-    ,   {'path_info': '/afterlife/hell/', 'title': 'Hell'}
-    ,   {'path_info': '/afterlife/purgatory/', 'title': 'Purgatory'}
-    ,   {'path_info': '/afterlife/reincarnation', 'title': 'Reincarnation'}
-    ,   {'path_info': '/afterlife/other/', 'title': 'Other'}
-    ,   {'path_info': '/person/',   'title': 'Person'}
-    ,   {'path_info': '/person/harry/',   'title': 'Harry'}
-    ,   {'path_info': '/person/sally/',   'title': 'Sally'}
-    ,   {'path_info': '/person/bender/',   'title': 'Bender'}
-    ,   {'path_info': '/person/ralpho/',   'title': 'Ralph'}
-    ,   {'path_info': '/caves/', 'title': 'Caves'}
-    ,   {'path_info': '/caves/copperhead/', 'title': 'Copperhead'}
-    ,   {'path_info': '/caves/con/', 'title': 'Con'}
-    ,   {'path_info': '/caves/hillside_bone/', 'title': 'Hillside Bone'}
-    ,   {'path_info': '/caves/lemonhole/', 'title': 'Lemonhole'}
-    ,   {'path_info': '/caves/bear/', 'title': 'Bear'}
-    ,   {'path_info': '/caves/coon/', 'title': 'Coon'}
-]
+        // Simulate a json response from a view like this:
+        //  /fmr/_design/couchapp_fmr/_view/by_path?key="006e34bb9218f22d92db682f06f2852d"
+        {value: {
+                "body":  "<p>Body</p>"
+            ,   "title":  "Foo"
+            ,   "author": "rtelep"
+            ,   "date": "2010/02/20 04:19:01 +0000"
+            ,   "path": []
+            ,   "_id": "006e34bb9218f22d92db682f06f2852d"
+        }}
 
+    ,   {value: {
+                "body":   "Another Post"
+            ,   "title":  "Bar"
+            ,   "author": "rtelep"
+            ,   "date": "2010/02/20 04:19:02 +0000"
+            ,   "path": ["006e34bb9218f22d92db682f06f2852d"]
+            ,   "_id": "0035f2d00861a0dc1886febefedcdffb"
+        }}
+
+    ,   {value: {
+                "body":  "<p>Body</p>"
+            ,   "title":  "Bar?  Baz"
+            ,   "author": "rtelep"
+            ,   "date": "2010/02/20 04:19:03 +0000"
+            ,   "path": ["006e34bb9218f22d92db682f06f2852d", "0035f2d00861a0dc1886febefedcdffb"]
+            ,   "_id": "005694b0ef025114b755034c73405d77"
+        }}
+
+    ,   {value: {
+                "body":  "<p>Body</p>"
+            ,   "title":  "Correct, Foo."
+            ,   "author": "rtelep"
+            ,   "date": "2010/02/20 04:19:04 +0000"
+            ,   "path": ["006e34bb9218f22d92db682f06f2852d"]
+            ,   "_id": "001f551ebbb1e2c15653c86c2ca34a63"
+        }}
+
+    ,   {value: {
+                "body":  "<p>Body</p>"
+            ,   "title":  "No, not Baz, Foo."
+            ,   "author": "rtelep"
+            ,   "date": "2010/02/20 04:19:05 +0000"
+            ,   "path": ["006e34bb9218f22d92db682f06f2852d", "0035f2d00861a0dc1886febefedcdffb", "005694b0ef025114b755034c73405d77"]
+            ,   "_id": "007cae3f9d9c4784e0dfab11ed1b9a4c"
+        }}
+
+    ,   {value: {
+                "body":  "<p>Body</p>"
+            ,   "title":  "Not Foo, Bar, or Baz, but Bash."
+            ,   "author": "rtelep"
+            ,   "date": "2010/02/20 04:19:06 +0000"
+            ,   "path": ["006e34bb9218f22d92db682f06f2852d", "0035f2d00861a0dc1886febefedcdffb", "005694b0ef025114b755034c73405d77", "007cae3f9d9c4784e0dfab11ed1b9a4c"]
+            ,   "_id": "e9ef451235ffde9cec9ce7ed9e187a2f"
+        }}
+    
+]
