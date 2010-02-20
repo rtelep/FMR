@@ -2,10 +2,6 @@ legacy fmr
     markdown
     attachments
 
-cookie/sessions
-
-_change
-
-CRUD
-
 Attachments
+
+A class for top-level posts, as for a thread?  for use in /list/posts.js

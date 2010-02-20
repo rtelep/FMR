@@ -4,10 +4,9 @@
  */
 
 function(head, req){
-    // !code _attachments/settings.js
-    // !code helpers/template.js
+    // !code _attachments/fmrJS/settings.js
+    // !code _attachments/lib/template.js
     // !code _attachments/fmrJS/fmr.js
-    // !code _attachments/fmrJS/thread.js
     // !json templates.head
     // !json templates.doc
     // !json templates.tail
@@ -28,12 +27,12 @@ function(head, req){
         var doc = t.docs[i];
         send(template(templates.doc, {
                author: doc.author
-            ,  id: doc._id
+            ,  _id: doc._id
             ,  title: get_title(doc)
-            ,  permalink: get_permalink(doc)
+            ,  permalink: doc.permalink
             ,  body: doc.body
-            ,  indentation: doc.indentation * settings.indendation_factor
-            ,  path: get_path_string(doc)
+            ,  indentation: doc.indentation
+            ,  path: doc.path_str
             ,  root: settings.root
         }));
     }

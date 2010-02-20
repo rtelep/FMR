@@ -4,8 +4,8 @@
  */
 
 function(doc, req) {
-    // !code _attachments/settings.js
-    // !code helpers/template.js
+    // !code _attachments/fmrJS/settings.js
+    // !code _attachments/lib/template.js
     // !json templates.doc
     if (doc) {
         return template(templates.doc, {
