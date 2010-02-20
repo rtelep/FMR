@@ -1,8 +1,12 @@
 Flanderous Music Repository
+===========================
 
-Using Couchapp [http://github.com/couchapp/couchapp]
+Get Couchapp [http://github.com/couchapp/couchapp]
 
-$ couchapp push fmr
-$ python etc/load_test_data.py
+Turn on cookie authentication, and create an admin:
+http://books.couchdb.org/relax/reference/security
 
-http://localhost:5984/fmr/_design/couchapp_fmr/_list/posts/threads
+$ couchapp push . http://user:pass@localhost:5984/a
+
+visit:
+http://localhost:5984/a/_design/fmr/_list/posts/threads
