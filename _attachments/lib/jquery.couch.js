@@ -122,7 +122,7 @@
       options = options || {};
       $.ajax({
         type: "POST", url: this.urlPrefix + "/_session", dataType: "json",
-        data: {name: options.name, password: options.password},
+        data: {username: options.name, name: options.name, password: options.password}, // watch out for username vs. name
         complete: function(req) {
           var resp = $.httpData(req, "json");
           if (req.status == 200) {

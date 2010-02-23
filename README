@@ -6,6 +6,9 @@ Get Couchapp [http://github.com/couchapp/couchapp]
 Turn on cookie authentication, and create an admin:
 http://books.couchdb.org/relax/reference/security
 
+Create a db "auth", with this _design:
+{"_id":"_design/_auth","_rev":"1-260c50d4bdd643ca77ffd4e5a799a5d9","language":"javascript","views":{"users":{"map":"function (doc) {\n if (doc.type == \"user\") {\n        emit(doc.username, doc);\n}\n}"}}}
+
 $ couchapp push . http://user:pass@localhost:5984/a
 
 visit:

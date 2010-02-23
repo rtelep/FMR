@@ -7,19 +7,23 @@
   </head> 
   <body>
     <div id="session">
-      <a href="<%= root %>/_list/posts/threads"><img src="http://dev.music.flanderous.com/_lib/images/title.jpg" /></a>
       <span style="display: none" id="logged_in">
         <span>Welcome <span id="username">-</span>.&nbsp;&nbsp;</span>
-        <span id="post">post</span>&nbsp;-&nbsp;
+        <span id="post">post,&nbsp;</span>
         <span id="logout">logout</span>
       </span>
       <span style="display: none"  id="logged_out">
         <form action="/_session" method="post">
           <input type="text" name="username" />
           <input type="password" name="password" />
-          <span id="login">login</span>
+          <!--span id="login">login</span-->
+          <input type="button" value="login" />
         </form>
       </span>
+      <span id="logo"><a href="<%= root %>/_list/posts/threads">
+        F&nbsp;-&nbsp;M&nbsp;-&nbsp;R&nbsp;&nbsp;
+        <!--img src="http://dev.music.flanderous.com/_lib/images/title.jpg" /-->
+      </a></span>
     </div>
 
     <!-- We clone this, change the ID, and insert it in various places on the DOM -->
