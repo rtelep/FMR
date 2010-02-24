@@ -34,23 +34,25 @@ A:hover {
 }
 #respond_inline {
     display: block;
+    width: 50px;
     margin-top: 40px;
-    font-size: 1em;
+    font-size: 1.5em;
 }
-.author {
+.author{
     font-size: .8em;
 }
 .title {
     font-size: 1.2em;
 }
-
-/* index */
 .row {
     padding: 10px;
     border-bottom: dotted 1px #B2BFC2;
     margin-bottom: 25px;
 }
-
+.count{
+    float: right;
+    font-size: .6em;
+}
 /* doc in a threaded view */
 .doc, #preview{
     padding: 25px;

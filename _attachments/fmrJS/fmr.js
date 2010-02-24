@@ -79,6 +79,15 @@ function sort_docs_by_date_oldest_first(doc_a, doc_b){
     }
 };
 
+function sort_docs_by_date_newest_first(doc_a, doc_b){
+    if (doc_a.date > doc_b.date) {
+        return -1
+    } else {
+        return 1
+    }
+};
+
+
 function sort_docs_by_indexed_path(doc_a, doc_b){
     // [1,2,3] , [1,2], [1], [1,4]  -> [1], [1,2], [1,2,3], [1,4]
     var a = doc_a.indexed_path;
@@ -189,7 +198,33 @@ function Thread(rows){
 };
 
 
+/**
+ * Model the index
+ */
 
+function Index(rows){
+    var Index = this;
+    Index.rows = rows;
+    Index.docs = [];
+
+    // Get docs from rows
+    for (var i in Index.rows){
+        var row = Index.rows[i];
+        var doc = {
+                author: row.value.author
+            ,  _id: row.value._id
+            ,  title: get_title(row.value)
+            ,  permalink: get_permalink(row.value)
+            ,  root: settings.root
+            ,  date: row.value.date
+        }
+        Index.docs.push(doc);
+    }
+    
+    Index.docs.sort(sort_docs_by_date_newest_first);
+
+    return true;
+}
 
 
 try{window}catch(e){window={};};

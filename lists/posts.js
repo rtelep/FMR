@@ -13,17 +13,22 @@ function(head, req){
     // !json templates.row
     // !json templates.tail
 
-    var row;
     start({"code": 200, "headers": {"Content-Type" : "text/html"}});
-    send(template(templates.head, {root: settings.root}));
+    
+    var row;
+    var rows = [];
     while(row = getRow()) {
-        send(template(templates.row, {
-               author: row.value.author
-            ,  _id: row.value._id
-            ,  title: get_title(row.value)
-            ,  permalink: get_permalink(row.value)
-            ,  root: settings.root
-        }));
+        rows.push(row);
     }
+
+    var index = new Index(rows);
+
+    send(template(templates.head, {root: settings.root}));
+
+    for (var i in index.docs) {
+        var doc = index.docs[i];
+        send(template(templates.row, doc));
+    }
+    
     send(template(templates.tail, {root: settings.root}));
 }

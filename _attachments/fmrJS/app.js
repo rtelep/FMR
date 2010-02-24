@@ -8,6 +8,7 @@ $.couch.app(function(app) {
   app.is_threaded_view = false;
   app.this_thread_id = $('INPUT[name=thread_id]').val();
   app.thread = null;
+  app.index = null;
   app.exposed = null;
 
   // By_path view
@@ -24,6 +25,7 @@ $.couch.app(function(app) {
   app.theseThreads = function(fn){
     app.view("threads",{
       limit : 25,
+      descending: true,
       success: function(json) {
         fn(json);
       }
@@ -35,7 +37,11 @@ $.couch.app(function(app) {
     app.thisThread(app.this_thread_id, function(json){
       app.thread = new Thread(json.rows);
     });
-  };
+  } else {
+    app.theseThreads(function(json){
+      app.index = new Index(json.rows);
+    });
+  }
 
   
   app.getTemplate = function(template_name, fn){
@@ -155,7 +161,7 @@ $.couch.app(function(app) {
       }
       
       var uuid = $.couch.newUUID();  // Do we want to think about using nicer _ids?  
-      var date = new Date(); // For now we are not allowing changing posts, just create new date each time.
+      var date = new Date().getTime(); // For now we are not allowing changing posts, just create new date each time.
       var doc = {
           author: $('#username').html()
         , title: $('#post_form [name=title]').val()
@@ -166,6 +172,18 @@ $.couch.app(function(app) {
       }
       app.db.saveDoc(doc, {success: function(resp){
         app.exposed.close();
+        
+        // If threaded view Top the top-level parent post by changing its date
+        if (app.is_threaded_view){
+          app.db.openDoc(app.this_thread_id, {
+            success: function(doc){
+                doc.date = new Date().getTime();
+                doc.FOO = "BAR";
+                app.db.saveDoc(doc);
+            }
+          });
+        };
+        
       }});
     });
   };
@@ -264,7 +282,7 @@ $.couch.app(function(app) {
   app.session();
 
   // _changes!
-  connectToChanges(app, function(){
+  connectToChanges(app, function(foo){
 
     // Handle a change on a thread
     if (app.is_threaded_view) {
@@ -288,13 +306,14 @@ $.couch.app(function(app) {
     // Handle a change on the index page.
     } else {
       app.theseThreads(function(json){
-        for (var i in json.rows){
-          var doc = json.rows[i].value;
-          if (! $('#'+doc._id).length){
-            doc['permalink'] = get_permalink(doc);
-            var html = template(app.row_template, doc);
-            $('#session').after(html);  // Insert at the top of the stack
-          }
+        // Just redraw all docs
+        $('.row').hide();
+        $('.row').remove();
+        app.index = new Index(json.rows);
+        for (var i in app.index.docs){
+          var doc = app.index.docs[i];
+          var html = template(app.row_template, doc);
+          $('#wrapper').append(html);
         }
       });
     }

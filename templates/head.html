@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
-  <head> 
+  <head>
     <title>Flanderous Music Repository</title> 
     <link rel="stylesheet" href="<%= root %>/style/main.css" type="text/css"> 
-  </head> 
+  </head>
   <body>
     <div id="session">
       <span style="display: none" id="logged_in">
@@ -30,7 +30,7 @@
     <div style="display:none" id="_post_form">
         <form action="" method="post">
             <table>
-                <tr><th><span>title:</span></th><td><input type="text" name="title" /></td></tr>
+                <tr><th><span>title:</span></th><td><input type="text" name="title" maxlength="80" /></td></tr>
                 <tr><th><span>body:</span></th><td><textarea rows="5" cols="100" name="body"></textarea></td></tr>
                 <tr><th>&nbsp;</th><td><input type="button" value="submit" /></td></tr>
                 <tr><th><span>preview:</span></th><td><div preview="true"></div></td></tr>
@@ -38,4 +38,5 @@
             </table>
         </form>
     </div>
-    
+
+    <div id="wrapper">    
