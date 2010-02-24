@@ -29,10 +29,14 @@ A:hover {
     width: 75px;
     height: 15px;
 }
-#post, #logout, #login {
+#post, #logout, #login, #respond_inline{
     cursor: pointer;
 }
-
+#respond_inline {
+    display: block;
+    margin-top: 40px;
+    font-size: 1em;
+}
 .author {
     font-size: .8em;
 }

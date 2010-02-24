@@ -4,6 +4,9 @@ legacy fmr
 
 Sign up
 
+Animate
+    _changes
+
 Attachments
 
 Modal
@@ -12,12 +15,4 @@ A class for top-level posts, as for a thread?  for use in /list/posts.js and els
 
 stop popup login from couch on failed post to _session
 
-Kill threaded responding
-
 Shake the title on change, a la Omegle.
-
-list of hacks:
-
-determine whether thread or index, and id of thread if thread, by parsing location.
-
-Get fmr.js out of view functions.  Create a duck.js for typing.

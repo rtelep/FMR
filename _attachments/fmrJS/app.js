@@ -6,8 +6,9 @@ $.couch.app(function(app) {
   
   app.live_session = false;
   app.is_threaded_view = false;
-  app.this_thread_id = null;
+  app.this_thread_id = $('INPUT[name=thread_id]').val();
   app.thread = null;
+  app.exposed = null;
 
   // By_path view
   app.thisThread = function(parent_id, fn) {
@@ -29,13 +30,12 @@ $.couch.app(function(app) {
     });
   };
 
-  try {
-    app.this_thread_id = document.location.search.split('=')[1].replace(/%22/g,'');
+  if (app.this_thread_id) {
     app.is_threaded_view = true;
     app.thisThread(app.this_thread_id, function(json){
       app.thread = new Thread(json.rows);
     });
-  } catch(e){}
+  };
 
   
   app.getTemplate = function(template_name, fn){
@@ -64,11 +64,15 @@ $.couch.app(function(app) {
       };
       $('#session #logged_out').hide();
       $('#session #logged_in').show();
+      if (app.is_threaded_view){
+        $('#respond_inline').show();
+      }
   };
 
   app.showLoggedOut = function(){
       $('#session #logged_in').hide();
       $('#session #logged_out').show();
+      $('#respond_inline').hide();
   };
 
   app.session = function(){
@@ -111,23 +115,29 @@ $.couch.app(function(app) {
       var editor = new Attacklab.wmd.editor(textarea, previewManager.refresh);
   
       // save everything so we can destroy it all later
-      app.WmdInstances.push({ta:textarea, div:previewDiv, ed:editor, pm:previewManager});
+      app.wmdInstance = ({ta:textarea, div:previewDiv, ed:editor, pm:previewManager});
   
       app.exposed = $('#post_form').expose({api: true, color: '#B9C7C9'}).load();
       app.exposed.onClose(app.destroyWmdInstance);
+      $(window).scroll(app.exposed.fit);
   };
   
   app.destroyWmdInstance = function() {
-      var inst = app.WmdInstances.pop();
-      if (inst) {
+      if (app.wmdInstance) {
           /***** destroy the editor and preview manager *****/
-          inst.pm.destroy();
-          inst.ed.destroy();
+          app.wmdInstance.pm.destroy();
+          app.wmdInstance.ed.destroy();
+          app.wmdInstance = null;
       }
 
-      $('#post_form').hide();
       $('#post_form').remove();
-
+      
+      // massage expose to fully close in some cases, I don't know why.
+      //console.log('triggering esc key');
+      //var e = $.Event('keydown');
+      //e.which = '27';  // esc key
+      //$('BODY').trigger(e);
+      
   };
 
   app.wirePostForm = function(){
@@ -144,8 +154,7 @@ $.couch.app(function(app) {
         return;
       }
       
-      //var uuid = $.couch.newUUID();  // Do we want to think about using nicer _ids?  
-      var uuid = $('#post_form [name=title]').val().replace(/ /g, '');
+      var uuid = $.couch.newUUID();  // Do we want to think about using nicer _ids?  
       var date = new Date(); // For now we are not allowing changing posts, just create new date each time.
       var doc = {
           author: $('#username').html()
@@ -156,24 +165,10 @@ $.couch.app(function(app) {
         , _id: uuid
       }
       app.db.saveDoc(doc, {success: function(resp){
-        app.resetPostForm();
-        app.refreshPage();
+        app.exposed.close();
       }});
     });
   };
-
-  app.resetPostForm = function(){
-    $('#post_form [name=title]').val('');
-    $('#post_form [name=body]').val('');
-    app.destroyWmdInstance();
-  };
-  
-  app.refreshPage = function(){
-    // When we get _changes this will change.
-    // location.reload(true);
-    app.exposed.close();
-  };
-
 
   // Logout Button
   $('#logout').click(function(){
@@ -200,6 +195,14 @@ $.couch.app(function(app) {
     }
   });
 
+  // Respond inline button
+  if (app.is_threaded_view) {
+    $('#respond_inline').click(function(){
+      // Effectively a double click on the top-level doc
+      $('#'+app.this_thread_id).trigger('dblclick');
+    });
+  };
+
   // Button to create a top-level post; Do this only once per page
   $('#post').click(function(){
     app.destroyWmdInstance();
@@ -217,6 +220,7 @@ $.couch.app(function(app) {
   app.wireDoubleClick = function(selector){
     $(selector).each(function(){
       $(this).bind('dblclick', function(){
+        console.log('Parent ID -> '+$(this).attr('id'));
         app.destroyWmdInstance();
         // Find the correct position for the form, by using Thread logic with a dummy response doc
         var this_path_str = get_path_str_from_parent_obj($(this));
@@ -272,12 +276,11 @@ $.couch.app(function(app) {
           var doc = app.thread.docs[i];
           if (! $('#'+doc._id).length){
             var html = template(app.doc_template, doc);
-            var parent_path_str = get_path_str_of_parent(doc);
             // Stick the new doc in after the doc before it.
             var insertion_index = app.thread.docs.indexOf(doc) - 1;
             var insertion_id = app.thread.docs[insertion_index]._id;
             $('#'+insertion_id).after(html);
-            app.wireDoubleClick('[path="'+doc.path_str+'"]'); // add double click to create child post
+            app.wireDoubleClick('#'+doc._id); // add double click to create child post
           }
         }
       });

@@ -22,7 +22,7 @@ function(head, req){
     var t = new Thread(rows);
 
     send(template(templates.head, {root: settings.root}));
-    
+    send('<input type="hidden" name="thread_id" value="'+t.id+'" />');
     for (var i in t.docs){
         var doc = t.docs[i];
         send(template(templates.doc, {

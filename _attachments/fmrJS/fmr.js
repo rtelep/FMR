@@ -21,11 +21,11 @@ function get_permalink(doc) {
         url += '#'+anchor;
     }
     return url
-}
+};
 
 function get_title(doc){
     return doc.title?doc.title:'';
-}
+};
 
 //function get_body(doc){
 //    if (is_top_level_post(doc)){
@@ -38,22 +38,22 @@ function get_title(doc){
 function get_path_str(doc){
     // comma-separated _id string
     return doc.path.join(',');
-}
+};
 
 function get_path_from_str(str){
     // array from comma-separated str.
     return str.split(',');
-}
+};
 
 function get_path_str_from_parent_obj(obj){
     // Given a parent doc div, return a path str for a child
     return obj.attr('path')?obj.attr('path')+','+obj.attr('id'):obj.attr('id');
-}
+};
 
 function get_path_str_of_parent(doc){
     // Given a doc, return the path string of its parent
     return doc.path_str.split(',').slice(0,-1).join(',');
-}
+};
 
 function get_indexed_path(doc, id_to_index){
     var _id;
@@ -65,19 +65,19 @@ function get_indexed_path(doc, id_to_index){
     }
     indexed_path.push(id_to_index[doc._id]); // Each doc has its own id in its path
     return indexed_path;
-}
+};
 
 /**
  * Sorting
  */
 
-function sort_docs_by_date_newest_first(doc_a, doc_b){
+function sort_docs_by_date_oldest_first(doc_a, doc_b){
     if (doc_a.date > doc_b.date) {
         return 1
     } else {
         return -1
     }
-}
+};
 
 function sort_docs_by_indexed_path(doc_a, doc_b){
     // [1,2,3] , [1,2], [1], [1,4]  -> [1], [1,2], [1,2,3], [1,4]
@@ -121,11 +121,11 @@ function sort_docs_by_indexed_path(doc_a, doc_b){
 
 function is_post(doc){
     return doc.author && doc.title;  // Enforce Title, not Body
-}
+};
 
 function is_top_level_post(doc){
     return is_post(doc) && !doc.path[0]; 
-}
+};
 
 /**
  * Model a thread
@@ -135,7 +135,8 @@ function Thread(rows){
     var Thread = this;
     Thread.rows = rows;
     Thread.docs = [];
-    Thread.html = '';    
+    Thread.html = '';
+    Thread.id = null;
     Thread.id_to_index = {};    
 
     // Get docs from rows
@@ -163,24 +164,29 @@ function Thread(rows){
         }
     };
 
-    // Sort docs by indexed_path
+    // Sort
     Thread.sort = function(){
-        Thread.docs.sort(sort_docs_by_date_newest_first);
+        // Sort by date
+        Thread.docs.sort(sort_docs_by_date_oldest_first);
+        // Map ids to indexes
+        Thread.map_ids_to_indexes();
+        // Add fields including indexed_path for further sorting
+        Thread.add_doc_fields();
+        // Sort by indexed path
         Thread.docs.sort(sort_docs_by_indexed_path);
     };
     
     Thread.add_doc = function(doc){
         Thread.docs.push(doc);
-        Thread.map_ids_to_indexes();
         Thread.sort();
     };
     
-    Thread.map_ids_to_indexes();
-    Thread.add_doc_fields();
-    Thread.sort();
+    Thread.sort();  // phew
+    
+    Thread.id = Thread.docs[0]._id;
     
     return true;
-}
+};
 
 
 
