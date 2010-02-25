@@ -217,6 +217,7 @@ function Index(rows){
             ,  permalink: get_permalink(row.value)
             ,  root: settings.root
             ,  date: row.value.date
+            ,  responses: row.value.responses?row.value.responses:0
         }
         Index.docs.push(doc);
     }

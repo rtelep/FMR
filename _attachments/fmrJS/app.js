@@ -178,7 +178,12 @@ $.couch.app(function(app) {
           app.db.openDoc(app.this_thread_id, {
             success: function(doc){
                 doc.date = new Date().getTime();
-                doc.FOO = "BAR";
+                // Count responses, why not?                
+                if (doc.responses){
+                  doc.responses += 1;
+                } else {
+                  doc.responses = 1;
+                }
                 app.db.saveDoc(doc);
             }
           });

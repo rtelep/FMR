@@ -7,9 +7,12 @@ Sign up
 Animate
     _changes
 
-Thread length
+Thread length?
 
-Search
+Full text search w/ Lucene
+    http://wiki.apache.org/couchdb/Full_text_search
+    http://github.com/rnewson/couchdb-lucene    
+    
 
 validate_doc_update
     Title length
