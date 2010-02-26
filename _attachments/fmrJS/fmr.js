@@ -162,7 +162,8 @@ function Thread(rows){
             doc['indentation'] = (doc.indexed_path.length - 1) * 40;  // Indentation factor buried here.
             doc['permalink'] = get_permalink(doc);
             doc['path_str'] = get_path_str(doc);
-            doc['attachment'] = doc._attachments?new Attachment(doc):{html: ''};
+            doc['attachment'] = new Attachment(doc)
+            doc['attachment_html'] = doc.attachment.html; // simplify template rendering
         }
     };
 
@@ -227,15 +228,27 @@ function Index(rows){
 function Attachment(doc){
     //{"Foo.jpg":{"stub":true,"content_type":"image/jpeg","length":32923,"revpos":2}}
     // only consider first attachment, we'll keep one att per doc.
+
     var Att = this;
-    Att.fn = get_keys(doc._attachments)[0];
-    Att.content_type = doc._attachments[Att.fn].content_type;
-    Att.length = doc._attachments[Att.fn].length;
-    Att.url = '/'+[settings.root.split('/')[1], doc._id, Att.fn].join('/');  // a hack
-    if (Att.content_type.split('/')[0] == 'image'){
-        Att.html = '<img class="attachment" src="'+Att.url+'" />';
+
+    if (! doc.has_attachment){
+        Att.html = ''; // no attachment on this doc, this object is a dummy.
     } else {
-        Att.html = '<a href="'+ Att.url +'">attachment</a>'
+        
+        // The doc may not be uploaded at this time, but it's coming.
+        try{
+            Att.fn = get_keys(doc._attachments)[0];
+            Att.content_type = doc._attachments[Att.fn].content_type;
+            Att.length = doc._attachments[Att.fn].length;
+            Att.url = '/'+[settings.root.split('/')[1], doc._id, Att.fn].join('/');  // a hack
+            if (Att.content_type.split('/')[0] == 'image'){
+                Att.html = '<img class="attachment" src="'+Att.url+'" />';
+            } else {
+                Att.html = '<a href="'+ Att.url +'">attachment</a>'
+            }
+        } catch(e){
+            Att.html = '<span class="attachment_pending">please wait, the attachment is being processed.</span>';
+        }
     }
     
     return true;

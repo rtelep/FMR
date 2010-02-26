@@ -153,6 +153,9 @@ $.couch.app(function(app) {
         app.modalMessage('The title field is required.');
         return;
       }
+
+      // attachment?        
+      var attachment = $('#file_form INPUT[type=file]').val();
       
       var uuid = $.couch.newUUID();  // Do we want to think about using nicer _ids?  
       var date = new Date().getTime(); // For now we are not allowing changing posts, just create new date each time.
@@ -163,12 +166,13 @@ $.couch.app(function(app) {
         , path: get_path_from_str($('#post_form [name=path]').val())
         , date: date
         , _id: uuid
+        , has_attachment: true
       }
       
       app.db.saveDoc(doc, {success: function(resp){
         app.exposed.close();
         
-        // If threaded view Top the top-level parent post by changing its date
+        // If threaded view, top the top-level parent post by changing its date
         if (app.is_threaded_view){
           app.db.openDoc(app.this_thread_id, {
             success: function(doc){
@@ -184,9 +188,8 @@ $.couch.app(function(app) {
           });
         };
 
-        // Attachments?
-        var fn = $('#file_form INPUT[type=file]').val();
-        if (fn){
+        // add the attachment
+        if (attachment){
           $('#file_form INPUT[name=_rev]').val(resp.rev);
           var url = app.db.uri+resp.id;
           $('#file_form').ajaxSubmit({
@@ -196,6 +199,7 @@ $.couch.app(function(app) {
             }
           });
         };
+        
       }});
     });
   };
@@ -303,14 +307,15 @@ $.couch.app(function(app) {
     // Handle a change on a thread
     if (app.is_threaded_view) {
       app.thisThread(app.this_thread_id, function(json){
+
         // Rebuild this thread.
         app.thread = new Thread(json.rows);
-        // Find the new doc and insert it.
+
         for (var i in app.thread.docs){
           var doc = app.thread.docs[i];
+          
+          // Find the new doc and insert it in the proper location
           if (! $('#'+doc._id).length){
-            // bring the attachment html over.
-            doc['attachment_html'] = doc.attachment.html;
             var html = template(app.doc_template, doc);
             // Stick the new doc in after the doc before it.
             var insertion_index = app.thread.docs.indexOf(doc) - 1;
@@ -318,6 +323,16 @@ $.couch.app(function(app) {
             $('#'+insertion_id).after(html);
             app.wireDoubleClick('#'+doc._id); // add double click to create child post
           }
+          
+          // Refresh attachments, as they may be uploading.
+          if (doc.attachment){
+            var html = template(app.doc_template, doc);
+            var insertion_id = doc.id;
+            $('#'+insertion_id).after(html);
+            app.wireDoubleClick('#'+doc._id); // add double click to create child post
+          }
+          
+          
         }
       });
       

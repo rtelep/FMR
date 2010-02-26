@@ -9,19 +9,21 @@ Animate
 
 Full text search w/ Lucene
     http://wiki.apache.org/couchdb/Full_text_search
-    http://github.com/rnewson/couchdb-lucene    
+    http://github.com/rnewson/couchdb-lucene
     
+couchapp to load auth db?
+
 set width of preview to == width of wmd editor
 
 validate_doc_update
     Title length
     Body length
 
+Disallow submit by enter from text fields, or catch it and process as by submit press.
+
 Attachments
-
-Take out all cute field handling on lists/thread.js, leave that to the Thread class. 
-
-
+    Can we get a change event when the attacment is finished being uploaded?
+    
 Modal
 
 stop popup login from couch on failed post to _session
