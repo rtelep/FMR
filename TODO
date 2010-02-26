@@ -7,12 +7,11 @@ Sign up
 Animate
     _changes
 
-Thread length?
-
 Full text search w/ Lucene
     http://wiki.apache.org/couchdb/Full_text_search
     http://github.com/rnewson/couchdb-lucene    
     
+set width of preview to == width of wmd editor
 
 validate_doc_update
     Title length
@@ -20,8 +19,13 @@ validate_doc_update
 
 Attachments
 
+Take out all cute field handling on lists/thread.js, leave that to the Thread class. 
+
+
 Modal
 
 stop popup login from couch on failed post to _session
 
 Shake the title on change, a la Omegle.
+
+Do we need to use $.couch.encodeDocId()

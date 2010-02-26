@@ -138,12 +138,6 @@ $.couch.app(function(app) {
 
       $('#post_form').remove();
       
-      // massage expose to fully close in some cases, I don't know why.
-      //console.log('triggering esc key');
-      //var e = $.Event('keydown');
-      //e.which = '27';  // esc key
-      //$('BODY').trigger(e);
-      
   };
 
   app.wirePostForm = function(){
@@ -152,7 +146,7 @@ $.couch.app(function(app) {
     // We need to have the hidden input name=path set to the path value for the new doc.
     // Each doc on the DOM in a threaded view has a path attr. which encodes the path array as a comma-separated str.
     
-    $('#post_form INPUT[value=submit]').click(function(){
+    $('#post_form_submit').click(function(){
       
       // Require title.  Any other validation here?
       if (! $('#post_form INPUT[name=title]').val()){
@@ -170,6 +164,7 @@ $.couch.app(function(app) {
         , date: date
         , _id: uuid
       }
+      
       app.db.saveDoc(doc, {success: function(resp){
         app.exposed.close();
         
@@ -188,7 +183,19 @@ $.couch.app(function(app) {
             }
           });
         };
-        
+
+        // Attachments?
+        var fn = $('#file_form INPUT[type=file]').val();
+        if (fn){
+          $('#file_form INPUT[name=_rev]').val(resp.rev);
+          var url = app.db.uri+resp.id;
+          $('#file_form').ajaxSubmit({
+              url: url
+            , success: function(resp){
+              // resp ->  <pre>{"ok":true,"id":"<id>","rev":"<rev>"}</pre>
+            }
+          });
+        };
       }});
     });
   };
@@ -218,6 +225,17 @@ $.couch.app(function(app) {
     }
   });
 
+  // clone #_post_form, return it as #post_form html
+  app.get_post_form = function(){
+    var form = $('#_post_form').clone();
+    form.attr('id','post_form');
+    form.find('[preview=true]').attr('id','preview');
+    form.find('[file_form=true]').attr('id','file_form');
+    form.find('[post_form_submit=true]').attr('id','post_form_submit');
+    // we are doing all of this because #_post_form remains on the DOM
+    return form
+  };
+
   // Respond inline button
   if (app.is_threaded_view) {
     $('#respond_inline').click(function(){
@@ -229,10 +247,7 @@ $.couch.app(function(app) {
   // Button to create a top-level post; Do this only once per page
   $('#post').click(function(){
     app.destroyWmdInstance();
-    // Get a clone of _post_form, and insert it after #session as #post_form
-    var form = $('#_post_form').clone();
-    form.attr('id','post_form');
-    form.find('[preview=true]').attr('id','preview');
+    var form = app.get_post_form();
     $('#session').after(form);
     app.wirePostForm();
     $('#post_form').slideDown();
@@ -243,7 +258,6 @@ $.couch.app(function(app) {
   app.wireDoubleClick = function(selector){
     $(selector).each(function(){
       $(this).bind('dblclick', function(){
-        console.log('Parent ID -> '+$(this).attr('id'));
         app.destroyWmdInstance();
         // Find the correct position for the form, by using Thread logic with a dummy response doc
         var this_path_str = get_path_str_from_parent_obj($(this));
@@ -259,10 +273,7 @@ $.couch.app(function(app) {
         var insertion_point = dummy_thread.docs.indexOf(dummy) - 1;  // find it in thread.docs
         var insertion_id = dummy_thread.docs[insertion_point]._id;
       
-        // get a clone of blank_post_form, and insert it after in correct spot as #post_form
-        var form = $('#_post_form').clone();
-        form.attr('id','post_form');
-        form.find('[preview=true]').attr('id','preview');
+        var form = app.get_post_form();
         $('#'+insertion_id).after(form);
         app.wirePostForm();
         form.slideDown();
@@ -298,6 +309,8 @@ $.couch.app(function(app) {
         for (var i in app.thread.docs){
           var doc = app.thread.docs[i];
           if (! $('#'+doc._id).length){
+            // bring the attachment html over.
+            doc['attachment_html'] = doc.attachment.html;
             var html = template(app.doc_template, doc);
             // Stick the new doc in after the doc before it.
             var insertion_index = app.thread.docs.indexOf(doc) - 1;

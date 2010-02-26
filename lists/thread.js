@@ -34,6 +34,7 @@ function(head, req){
             ,  indentation: doc.indentation
             ,  path: doc.path_str
             ,  root: settings.root
+            ,  attachment_html: doc.attachment.html
         }));
     }
     

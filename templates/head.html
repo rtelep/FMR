@@ -16,27 +16,40 @@
         <form action="/_session" method="post">
           <input type="text" name="username" />
           <input type="password" name="password" />
-          <!--span id="login">login</span-->
           <input type="button" value="login" />
         </form>
       </span>
       <span id="logo"><a href="<%= root %>/_list/posts/threads">
         F&nbsp;-&nbsp;M&nbsp;-&nbsp;R&nbsp;&nbsp;
-        <!--img src="http://dev.music.flanderous.com/_lib/images/title.jpg" /-->
       </a></span>
     </div>
 
-    <!-- We clone this, change the ID, and insert it in various places on the DOM -->
     <div style="display:none" id="_post_form">
         <form action="" method="post">
-            <table>
-                <tr><th><span>title:</span></th><td><input type="text" name="title" maxlength="80" /></td></tr>
-                <tr><th><span>body:</span></th><td><textarea rows="5" cols="100" name="body"></textarea></td></tr>
-                <tr><th>&nbsp;</th><td><input type="button" value="submit" /></td></tr>
-                <tr><th><span>preview:</span></th><td><div preview="true"></div></td></tr>
-                <input type="hidden" name="path" value="" />
-            </table>
+          <table>
+              <tr><th><span>title:</span></th><td><input type="text" name="title" maxlength="80" /></td></tr>
+              <tr><th><span>body:</span></th><td><textarea rows="5" cols="100" name="body"></textarea></td></tr>
+              <input type="hidden" name="path" value="" />
+          </table>
         </form>
+        <form file_form="true" action="" method="post" enctype="multipart/form-data">
+          <table>
+            <tr>
+              <th><span>file:</span></th>
+              <td>
+                <input type="hidden" name="_rev" value="">
+                <input type="file" name="_attachments" />
+              </td>
+            </tr>
+          </table>
+        </form>
+        <table>
+          <tr>
+            <th><span>&nbsp;</span></th>
+            <td><input post_form_submit="true" type="button" value="submit" /></td>
+          </tr>
+          <tr><th><span>preview:</span></th><td><div preview="true"></div></td></tr>
+        </table>
     </div>
 
     <div id="wrapper">    

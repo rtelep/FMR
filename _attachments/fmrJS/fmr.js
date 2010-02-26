@@ -27,14 +27,6 @@ function get_title(doc){
     return doc.title?doc.title:'';
 };
 
-//function get_body(doc){
-//    if (is_top_level_post(doc)){
-//        return doc.body;
-//    } else {
-//        return '<p>'+doc.body+'</p>';
-//    }
-//}
-
 function get_path_str(doc){
     // comma-separated _id string
     return doc.path.join(',');
@@ -170,6 +162,7 @@ function Thread(rows){
             doc['indentation'] = (doc.indexed_path.length - 1) * 40;  // Indentation factor buried here.
             doc['permalink'] = get_permalink(doc);
             doc['path_str'] = get_path_str(doc);
+            doc['attachment'] = doc._attachments?new Attachment(doc):{html: ''};
         }
     };
 
@@ -227,6 +220,27 @@ function Index(rows){
     return true;
 }
 
+/**
+ * Model an attachment
+ */
+
+function Attachment(doc){
+    //{"Foo.jpg":{"stub":true,"content_type":"image/jpeg","length":32923,"revpos":2}}
+    // only consider first attachment, we'll keep one att per doc.
+    var Att = this;
+    Att.fn = get_keys(doc._attachments)[0];
+    Att.content_type = doc._attachments[Att.fn].content_type;
+    Att.length = doc._attachments[Att.fn].length;
+    Att.url = '/'+[settings.root.split('/')[1], doc._id, Att.fn].join('/');  // a hack
+    if (Att.content_type.split('/')[0] == 'image'){
+        Att.html = '<img class="attachment" src="'+Att.url+'" />';
+    } else {
+        Att.html = '<a href="'+ Att.url +'">attachment</a>'
+    }
+    
+    return true;
+}
+
 
 try{window}catch(e){window={};};
 try{console}catch(e){console={};};
@@ -241,4 +255,11 @@ if (!window.console || !console)
     window.console[names[i]] = function() {}
 }
 
+get_keys = function (l){
+  var keys = [];
+  for(i in l) if (l.hasOwnProperty(i)){
+    keys.push(i);
+  }
+  return keys;
+}
 
