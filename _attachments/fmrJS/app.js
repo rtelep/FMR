@@ -6,15 +6,15 @@ $.couch.app(function(app) {
   
   app.live_session = false;
   app.is_threaded_view = false;
-  app.this_thread_id = $('INPUT[name=thread_id]').val();
+  app.this_thread_id = $('INPUT[name=thread_id]').val();  // crappy way to communicate this from the server
   app.thread = null;
   app.index = null;
   app.exposed = null;
 
   // By_path view
-  app.thisThread = function(parent_id, fn) {
+  app.thisThread = function(fn) {
     app.view("by_path",{
-      key : parent_id,
+      key : app.this_thread_id,
       success: function(json) {
         fn(json);
       }
@@ -34,7 +34,7 @@ $.couch.app(function(app) {
 
   if (app.this_thread_id) {
     app.is_threaded_view = true;
-    app.thisThread(app.this_thread_id, function(json){
+    app.thisThread(function(json){
       app.thread = new Thread(json.rows);
     });
   } else {
@@ -166,7 +166,10 @@ $.couch.app(function(app) {
         , path: get_path_from_str($('#post_form [name=path]').val())
         , date: date
         , _id: uuid
-        , has_attachment: true
+      }
+
+      if (attachment){
+        doc.has_attachment = true;
       }
       
       app.db.saveDoc(doc, {success: function(resp){
@@ -190,12 +193,22 @@ $.couch.app(function(app) {
 
         // add the attachment
         if (attachment){
+          
+          $.modal
+          
           $('#file_form INPUT[name=_rev]').val(resp.rev);
           var url = app.db.uri+resp.id;
+          
           $('#file_form').ajaxSubmit({
               url: url
             , success: function(resp){
               // resp ->  <pre>{"ok":true,"id":"<id>","rev":"<rev>"}</pre>
+              
+              
+              // make a trivial change to this doc to cause every connected browser to see the file is uploaded.
+              doc.date = new Date().getTime();
+              //app.db.saveDoc(doc);
+
             }
           });
         };
@@ -301,54 +314,60 @@ $.couch.app(function(app) {
   // Handle the session
   app.session();
 
+
+  // Rebuild this thread
+  app.update_thread = function(json){
+    app.thread = new Thread(json.rows);
+
+    for (var i in app.thread.docs){
+      var doc = app.thread.docs[i];
+      
+      // Find the new doc and insert it in the proper location
+      if (! $('#'+doc._id).length){
+        var html = template(app.doc_template, doc);
+        // Stick the new doc in after the doc before it.
+        var insertion_index = app.thread.docs.indexOf(doc) - 1;
+        var insertion_id = app.thread.docs[insertion_index]._id;
+        $('#'+insertion_id).after(html);
+        app.wireDoubleClick('#'+doc._id); // add double click to create child post
+      }
+      
+      // Refresh attachments, as they may be uploading.
+      if (doc.attachment){
+        var html = template(app.doc_template, doc);
+        var insertion_id = doc.id;
+        $('#'+insertion_id).after(html);
+        app.wireDoubleClick('#'+doc._id); // add double click to create child post
+      }
+
+    }
+
+  };
+
+  // Rebuild the index
+  app.update_index = function(json){
+    // Just redraw all docs
+    $('.row').hide();
+    $('.row').remove();
+    app.index = new Index(json.rows);
+    for (var i in app.index.docs){
+      var doc = app.index.docs[i];
+      var html = template(app.row_template, doc);
+      $('#wrapper').append(html);
+    }
+  };
+
+
   // _changes!
   connectToChanges(app, function(foo){
 
     // Handle a change on a thread
     if (app.is_threaded_view) {
-      app.thisThread(app.this_thread_id, function(json){
+      app.thisThread(app.update_thread);
 
-        // Rebuild this thread.
-        app.thread = new Thread(json.rows);
-
-        for (var i in app.thread.docs){
-          var doc = app.thread.docs[i];
-          
-          // Find the new doc and insert it in the proper location
-          if (! $('#'+doc._id).length){
-            var html = template(app.doc_template, doc);
-            // Stick the new doc in after the doc before it.
-            var insertion_index = app.thread.docs.indexOf(doc) - 1;
-            var insertion_id = app.thread.docs[insertion_index]._id;
-            $('#'+insertion_id).after(html);
-            app.wireDoubleClick('#'+doc._id); // add double click to create child post
-          }
-          
-          // Refresh attachments, as they may be uploading.
-          if (doc.attachment){
-            var html = template(app.doc_template, doc);
-            var insertion_id = doc.id;
-            $('#'+insertion_id).after(html);
-            app.wireDoubleClick('#'+doc._id); // add double click to create child post
-          }
-          
-          
-        }
-      });
-      
     // Handle a change on the index page.
     } else {
-      app.theseThreads(function(json){
-        // Just redraw all docs
-        $('.row').hide();
-        $('.row').remove();
-        app.index = new Index(json.rows);
-        for (var i in app.index.docs){
-          var doc = app.index.docs[i];
-          var html = template(app.row_template, doc);
-          $('#wrapper').append(html);
-        }
-      });
+      app.theseThreads(app.update_index);
     }
 
   });

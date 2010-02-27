@@ -231,6 +231,8 @@ function Attachment(doc){
 
     var Att = this;
 
+    try{console.log(doc);}catch(e){};
+
     if (! doc.has_attachment){
         Att.html = ''; // no attachment on this doc, this object is a dummy.
     } else {
@@ -247,7 +249,7 @@ function Attachment(doc){
                 Att.html = '<a href="'+ Att.url +'">attachment</a>'
             }
         } catch(e){
-            Att.html = '<span class="attachment_pending">please wait, the attachment is being processed.</span>';
+            Att.html = '<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /> uploading</span>';
         }
     }
     

@@ -18,16 +18,24 @@ set width of preview to == width of wmd editor
 validate_doc_update
     Title length
     Body length
+    Attachment size
 
 Disallow submit by enter from text fields, or catch it and process as by submit press.
 
 Attachments
-    Can we get a change event when the attacment is finished being uploaded?
-    
+    popup for upload a la futon
+        (leaving index page during upload loses the att....)
+
 Modal
 
 stop popup login from couch on failed post to _session
 
 Shake the title on change, a la Omegle.
 
+media types:
+    player?
+
+WhyDoWeHaveThis and sometimes_this for function names?
+
 Do we need to use $.couch.encodeDocId()
+
