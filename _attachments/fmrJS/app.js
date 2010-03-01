@@ -11,6 +11,11 @@ $.couch.app(function(app) {
   app.index = null;
   app.exposed = null;
 
+  /**
+   * Views
+   * ****************************************************
+   */
+
   // By_path view
   app.thisThread = function(fn) {
     app.view("by_path",{
@@ -32,6 +37,11 @@ $.couch.app(function(app) {
     });
   };
 
+  /**
+   * Fork this app for Thread or Index
+   * ****************************************************
+   */
+
   if (app.this_thread_id) {
     app.is_threaded_view = true;
     app.thisThread(function(json){
@@ -43,7 +53,11 @@ $.couch.app(function(app) {
     });
   }
 
-  
+  /**
+   *  Templates
+   * ****************************************************
+   */
+
   app.getTemplate = function(template_name, fn){
     // Synchronously get a template from the design doc.
     //  We're doing this so we can use the same template here and on the server.
@@ -63,6 +77,11 @@ $.couch.app(function(app) {
   app.doc_template = app.getTemplate('doc');  // doc in a threaded view
   app.row_template = app.getTemplate('row');  // doc on index page, top-level posts only.
   
+  /**
+   * Session
+   * ****************************************************
+   */
+
   app.showLoggedIn = function(name){
       $('#username').html(name);
       if (app.is_threaded_view){
@@ -95,10 +114,47 @@ $.couch.app(function(app) {
     })  
   };
 
+  // Logout Button
+  $('#logout').click(function(){
+    $.couch.logout({success: function(){
+      app.session();
+    }});
+  });
+
+  // Login Button
+  $('INPUT[value=login]').click(function(){
+    if ($('[name=username]').val() && $('[name=password]').val()){
+      $.couch.login({
+          name: $('[name=username]').val()
+        , password: $('[name=password]').val()
+        , success: function(resp){
+            app.session();
+        }
+        , error: function(status, error, reason){
+            app.modalMessage(reason);
+        }
+      })
+    } else {
+      app.modalMessage('Please provide username and password.');
+    }
+  });
+
+  /**
+   * Dialog
+   * ****************************************************
+   */
+  
   app.modalMessage = function(message){
     // get jquery.modal.js for this?
     alert(message);
   }
+  
+  
+  /**
+   * WMD editor
+   * http://wmd-editor.com/
+   * ****************************************************
+   */
   
   app.WmdInstances = [];
   
@@ -139,6 +195,12 @@ $.couch.app(function(app) {
       $('#post_form').remove();
       
   };
+
+
+  /**
+   * Posting
+   * ****************************************************
+   */
 
   app.wirePostForm = function(){
     // Post Form, used to create new posts, and *also* to respond to posts.
@@ -217,30 +279,6 @@ $.couch.app(function(app) {
     });
   };
 
-  // Logout Button
-  $('#logout').click(function(){
-    $.couch.logout({success: function(){
-      app.session();
-    }});
-  });
-
-  // Login Button
-  $('INPUT[value=login]').click(function(){
-    if ($('[name=username]').val() && $('[name=password]').val()){
-      $.couch.login({
-          name: $('[name=username]').val()
-        , password: $('[name=password]').val()
-        , success: function(resp){
-            app.session();
-        }
-        , error: function(status, error, reason){
-            app.modalMessage(reason);
-        }
-      })
-    } else {
-      app.modalMessage('Please provide username and password.');
-    }
-  });
 
   // clone #_post_form, return it as #post_form html
   app.get_post_form = function(){
@@ -311,9 +349,11 @@ $.couch.app(function(app) {
     $('.doc').unbind('dblclick');
   };
 
-  // Handle the session
-  app.session();
 
+  /**
+   * Changes
+   * ****************************************************
+   */
 
   // Rebuild this thread
   app.update_thread = function(json){
@@ -358,9 +398,18 @@ $.couch.app(function(app) {
   };
 
 
-  // _changes!
-  connectToChanges(app, function(foo){
 
+
+  /**
+   * Put things into motion
+   * ****************************************************
+   */
+
+  // Begin the session
+  app.session();
+
+  // Connect to _changes!
+  connectToChanges(app, function(foo){
     // Handle a change on a thread
     if (app.is_threaded_view) {
       app.thisThread(app.update_thread);
@@ -369,13 +418,12 @@ $.couch.app(function(app) {
     } else {
       app.theseThreads(app.update_index);
     }
-
   });
 
 });
 
   
-
+// From CouchDB Toast:  http://github.com/jchris/toast/blob/master/_attachments/app.js
 function connectToChanges(app, fn) {
   function resetHXR(x) {
     x.abort();
