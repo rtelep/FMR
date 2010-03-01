@@ -143,10 +143,26 @@ $.couch.app(function(app) {
    * Dialog
    * ****************************************************
    */
-  
+
+  app.dialog_box = $('#dialog').dialog({
+      autoOpen: false
+    , modal: true
+    , buttons: {
+        'Ok': function(){
+          $(this).dialog('close');
+        }
+    }
+  });
+
   app.modalMessage = function(message){
     // get jquery.modal.js for this?
-    alert(message);
+    app.dialog_box.html(message);
+    app.dialog_box.dialog('open');
+    
+  }
+
+  app.waitForUpload = function(message){
+    // blah.
   }
   
   
@@ -281,7 +297,7 @@ $.couch.app(function(app) {
 
 
   // clone #_post_form, return it as #post_form html
-  app.get_post_form = function(){
+  app.getPostForm = function(){
     var form = $('#_post_form').clone();
     form.attr('id','post_form');
     form.find('[preview=true]').attr('id','preview');
@@ -302,7 +318,7 @@ $.couch.app(function(app) {
   // Button to create a top-level post; Do this only once per page
   $('#post').click(function(){
     app.destroyWmdInstance();
-    var form = app.get_post_form();
+    var form = app.getPostForm();
     $('#session').after(form);
     app.wirePostForm();
     $('#post_form').slideDown();
@@ -328,7 +344,7 @@ $.couch.app(function(app) {
         var insertion_point = dummy_thread.docs.indexOf(dummy) - 1;  // find it in thread.docs
         var insertion_id = dummy_thread.docs[insertion_point]._id;
       
-        var form = app.get_post_form();
+        var form = app.getPostForm();
         $('#'+insertion_id).after(form);
         app.wirePostForm();
         form.slideDown();
@@ -356,7 +372,7 @@ $.couch.app(function(app) {
    */
 
   // Rebuild this thread
-  app.update_thread = function(json){
+  app.updateThread = function(json){
     app.thread = new Thread(json.rows);
 
     for (var i in app.thread.docs){
@@ -385,7 +401,7 @@ $.couch.app(function(app) {
   };
 
   // Rebuild the index
-  app.update_index = function(json){
+  app.updateIndex = function(json){
     // Just redraw all docs
     $('.row').hide();
     $('.row').remove();
@@ -412,11 +428,11 @@ $.couch.app(function(app) {
   connectToChanges(app, function(foo){
     // Handle a change on a thread
     if (app.is_threaded_view) {
-      app.thisThread(app.update_thread);
+      app.thisThread(app.updateThread);
 
     // Handle a change on the index page.
     } else {
-      app.theseThreads(app.update_index);
+      app.theseThreads(app.updateIndex);
     }
   });
 
