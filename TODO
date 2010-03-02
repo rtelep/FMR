@@ -23,10 +23,9 @@ validate_doc_update
 Disallow submit by enter from text fields, or catch it and process as by submit press.
 
 Attachments
-    popup for upload a la futon
-        (leaving index page during upload loses the att....)
-
-Modal
+    Modal dialog is messing up #file_form submit w/ ajaxSubmit I think, in FF.
+    
+    on changes ignore docs with attachments that are being uploaded.
 
 stop popup login from couch on failed post to _session
 
@@ -34,8 +33,6 @@ Shake the title on change, a la Omegle.
 
 media types:
     player?
-
-WhyDoWeHaveThis and sometimes_this for function names?
 
 Do we need to use $.couch.encodeDocId()
 

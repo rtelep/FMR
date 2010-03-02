@@ -213,6 +213,9 @@ function Index(rows){
             ,  date: row.value.date
             ,  responses: row.value.responses?row.value.responses:0
         }
+        doc.attachment = new Attachment(doc)
+        doc.attachment_html = doc.attachment.html // simplify template rendering
+
         Index.docs.push(doc);
     }
     
@@ -231,8 +234,6 @@ function Attachment(doc){
 
     var Att = this;
 
-    try{console.log(doc);}catch(e){};
-
     if (! doc.has_attachment){
         Att.html = ''; // no attachment on this doc, this object is a dummy.
     } else {
@@ -249,7 +250,8 @@ function Attachment(doc){
                 Att.html = '<a href="'+ Att.url +'">attachment</a>'
             }
         } catch(e){
-            Att.html = '<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /> uploading</span>';
+            //Att.html = '<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /> uploading</span>';
+            Att.html = null;
         }
     }
     
@@ -259,6 +261,7 @@ function Attachment(doc){
 
 try{window}catch(e){window={};};
 try{console}catch(e){console={};};
+try{log}catch(e){log = function(){}};
 
 if (!window.console || !console)
 {

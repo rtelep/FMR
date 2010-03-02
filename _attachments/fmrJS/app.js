@@ -146,26 +146,21 @@ $.couch.app(function(app) {
 
   app.dialog_box = $('#dialog').dialog({
       autoOpen: false
-    , modal: true
-    , buttons: {
-        'Ok': function(){
-          $(this).dialog('close');
-        }
-    }
+     , modal: true
   });
 
   app.modalMessage = function(message){
     // get jquery.modal.js for this?
     app.dialog_box.html(message);
+    app.dialog_box.dialog('option', 'buttons', {
+      'Ok': function(){
+        app.dialog_box.dialog('close');
+      }
+    })
     app.dialog_box.dialog('open');
     
   }
 
-  app.waitForUpload = function(message){
-    // blah.
-  }
-  
-  
   /**
    * WMD editor
    * http://wmd-editor.com/
@@ -271,17 +266,39 @@ $.couch.app(function(app) {
 
         // add the attachment
         if (attachment){
+        
+          // Begin the wait-for-upload dialog
+          app.dialog_box.html('Please wait for your attachment to finish uploading.');
+          app.dialog_box.append('<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /></span>');
+          app.dialog_box.dialog('option', 'buttons', {
+              'cancel': function(){
+                $(this).dialog('close');
+                // Remove the doc that didn't get the attachment.
+                app.db.removeDoc(doc);
+              }
+          })
           
-          $.modal
-          
+          app.dialog_box.dialog('open');
+
           $('#file_form INPUT[name=_rev]').val(resp.rev);
           var url = app.db.uri+resp.id;
-          
+          console.log('url', url);
+          // Submit #file_form
           $('#file_form').ajaxSubmit({
               url: url
+            , beforeSubmit: function(){
+            }
+            , complete: function(xhr){
+              console.log('Complete', xhr);
+            }
+            , error: function(a, b, c){
+              console.log('Error', c);
+            }
             , success: function(resp){
               // resp ->  <pre>{"ok":true,"id":"<id>","rev":"<rev>"}</pre>
-              
+              console.log(resp);
+              // Finish the wait-for-upload dialog
+              app.dialog_box.dialog('close');
               
               // make a trivial change to this doc to cause every connected browser to see the file is uploaded.
               doc.date = new Date().getTime();
@@ -289,6 +306,9 @@ $.couch.app(function(app) {
 
             }
           });
+          
+          $
+          
         };
         
       }});
@@ -378,8 +398,9 @@ $.couch.app(function(app) {
     for (var i in app.thread.docs){
       var doc = app.thread.docs[i];
       
-      // Find the new doc and insert it in the proper location
-      if (! $('#'+doc._id).length){
+      // Find the new doc and insert it in the proper location,
+      if (! $('#'+doc._id).length ){
+        if (doc.has_attachment && !doc.attachment_html){continue}; // Skip it if it's a new doc with an attachment pending
         var html = template(app.doc_template, doc);
         // Stick the new doc in after the doc before it.
         var insertion_index = app.thread.docs.indexOf(doc) - 1;
@@ -388,14 +409,6 @@ $.couch.app(function(app) {
         app.wireDoubleClick('#'+doc._id); // add double click to create child post
       }
       
-      // Refresh attachments, as they may be uploading.
-      if (doc.attachment){
-        var html = template(app.doc_template, doc);
-        var insertion_id = doc.id;
-        $('#'+insertion_id).after(html);
-        app.wireDoubleClick('#'+doc._id); // add double click to create child post
-      }
-
     }
 
   };
@@ -408,6 +421,7 @@ $.couch.app(function(app) {
     app.index = new Index(json.rows);
     for (var i in app.index.docs){
       var doc = app.index.docs[i];
+      if (doc.has_attachment && !doc.attachment_html){continue}; // Skip it if it's a new doc with an attachment pending
       var html = template(app.row_template, doc);
       $('#wrapper').append(html);
     }
