@@ -60,8 +60,8 @@ IMG.attachment {
     float: right;
     font-size: .6em;
 }
-/* doc in a threaded view */
 .doc, #preview{
+    width: 700px;
     padding: 25px;
     margin-bottom: 10px;
     border: solid 1px #C8DADE;

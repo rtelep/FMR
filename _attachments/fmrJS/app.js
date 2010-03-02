@@ -188,8 +188,12 @@ $.couch.app(function(app) {
       // save everything so we can destroy it all later
       app.wmdInstance = ({ta:textarea, div:previewDiv, ed:editor, pm:previewManager});
   
-      app.exposed = $('#post_form').expose({api: true, color: '#A3A6A8'}).load();
-      app.exposed.onClose(app.destroyWmdInstance);
+      app.exposed = $('#post_form').expose({
+          api: true
+        , color: '#A3A6A8'
+        , zIndex: 800
+        , onClose: app.destroyWmdInstance
+      }).load();
       $(window).scroll(app.exposed.fit);
   };
   

@@ -24,8 +24,9 @@ validate_doc_update
 
 Disallow submit by enter from text fields, or catch it and process as by submit press.
 
-Attachments
-    expose and blockUI mask clash
+scroll to post_form when it is far away?
+
+expose and blockUI mask clash
     
 stop popup login from couch on failed post to _session
 
