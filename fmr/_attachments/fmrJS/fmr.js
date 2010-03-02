@@ -226,7 +226,8 @@ function Attachment(doc){
     // only consider first attachment, we'll keep one att per doc.
 
     var Att = this;
-
+    Att.pending = false;
+    
     if (! doc.has_attachment){
         Att.html = ''; // no attachment on this doc, this object is a dummy.
     } else {
