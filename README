@@ -3,11 +3,12 @@ Flanderous Music Repository
 
 Get Couchapp [http://github.com/couchapp/couchapp]
 
-Turn on cookie authentication, and create an admin:
-http://books.couchdb.org/relax/reference/security
+Turn on cookie authentication in CouchDb, and create an admin [http://books.couchdb.org/relax/reference/security]
 
-edit fmr/.couchapprc and auth/.couchapprc to contain your username and password
-(reset.sh too if you want to use it.)
+Edit fmr/.couchapprc and auth/.couchapprc to contain your username and password (Edit reset.sh too if you want to use it.)
 
-visit:
+Push the applications:
+$ ./push.sh
+
+Visit:
 http://localhost:5984/a/_design/fmr/_list/posts/threads
