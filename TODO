@@ -15,6 +15,8 @@ couchapp to load auth db?
 
 set width of preview to == width of wmd editor
 
+optimize as this is getting bulky.
+
 validate_doc_update
     Title length
     Body length
@@ -23,10 +25,8 @@ validate_doc_update
 Disallow submit by enter from text fields, or catch it and process as by submit press.
 
 Attachments
-    Modal dialog is messing up #file_form submit w/ ajaxSubmit I think, in FF.
+    expose and blockUI mask clash
     
-    on changes ignore docs with attachments that are being uploaded.
-
 stop popup login from couch on failed post to _session
 
 Shake the title on change, a la Omegle.

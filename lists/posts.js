@@ -27,8 +27,7 @@ function(head, req){
 
     for (var i in index.docs) {
         var doc = index.docs[i];
-        // Doc may have an attachment currently being uploaded, skip these.
-        if (doc.has_attachment && !doc.html){
+        if (doc.attachment_pending){
             continue
         }
         send(template(templates.row, doc));

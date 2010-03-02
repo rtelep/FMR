@@ -158,12 +158,12 @@ function Thread(rows){
         // also add useful fields
         for (var i in Thread.docs){
             var doc = Thread.docs[i];
-            doc['indexed_path'] = get_indexed_path(doc, Thread.id_to_index);
-            doc['indentation'] = (doc.indexed_path.length - 1) * 40;  // Indentation factor buried here.
-            doc['permalink'] = get_permalink(doc);
-            doc['path_str'] = get_path_str(doc);
-            doc['attachment'] = new Attachment(doc)
-            doc['attachment_html'] = doc.attachment.html; // simplify template rendering
+            doc.indexed_path = get_indexed_path(doc, Thread.id_to_index);
+            doc.indentation = (doc.indexed_path.length - 1) * 40;  // Indentation factor buried here.
+            doc.permalink = get_permalink(doc);
+            doc.path_str = get_path_str(doc);
+            doc.attachment = new Attachment(doc)
+            doc.attachment_html = doc.attachment.html; // simplify template rendering
         }
     };
 
@@ -203,18 +203,11 @@ function Index(rows){
 
     // Get docs from rows
     for (var i in Index.rows){
-        var row = Index.rows[i];
-        var doc = {
-                author: row.value.author
-            ,  _id: row.value._id
-            ,  title: get_title(row.value)
-            ,  permalink: get_permalink(row.value)
-            ,  root: settings.root
-            ,  date: row.value.date
-            ,  responses: row.value.responses?row.value.responses:0
-        }
-        doc.attachment = new Attachment(doc)
-        doc.attachment_html = doc.attachment.html // simplify template rendering
+        var doc = Index.rows[i].value;
+        doc.permalink = get_permalink(doc);
+        doc.responses = doc.responses?doc.responses:0;
+        doc.attachment = new Attachment(doc);
+        doc.attachment_html = doc.attachment.html;  // simplify template rendering
 
         Index.docs.push(doc);
     }
@@ -241,6 +234,12 @@ function Attachment(doc){
         // The doc may not be uploaded at this time, but it's coming.
         try{
             Att.fn = get_keys(doc._attachments)[0];
+        } catch(e){
+            Att.pending = true;
+        }
+        
+        // Create the full attachment object
+        if (!Att.pending) {
             Att.content_type = doc._attachments[Att.fn].content_type;
             Att.length = doc._attachments[Att.fn].length;
             Att.url = '/'+[settings.root.split('/')[1], doc._id, Att.fn].join('/');  // a hack
@@ -249,9 +248,6 @@ function Attachment(doc){
             } else {
                 Att.html = '<a href="'+ Att.url +'">attachment</a>'
             }
-        } catch(e){
-            //Att.html = '<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /> uploading</span>';
-            Att.html = null;
         }
     }
     

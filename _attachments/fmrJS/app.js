@@ -141,24 +141,22 @@ $.couch.app(function(app) {
 
   /**
    * Dialog
+   * http://malsup.com/jquery/block/
    * ****************************************************
    */
 
-  app.dialog_box = $('#dialog').dialog({
-      autoOpen: false
-     , modal: true
-  });
-
   app.modalMessage = function(message){
-    // get jquery.modal.js for this?
-    app.dialog_box.html(message);
-    app.dialog_box.dialog('option', 'buttons', {
-      'Ok': function(){
-        app.dialog_box.dialog('close');
-      }
+    $.blockUI({
+          message:
+                '<p>'+message+'</p>'
+              + '<input id="dialog_button" type="button" value="ok">'
+        , overlayCSS: {
+            backgroundColor: '#A3A6A8'
+          } 
+    });
+    $('#dialog_button').click(function(){
+      $.unblockUI();
     })
-    app.dialog_box.dialog('open');
-    
   }
 
   /**
@@ -190,7 +188,7 @@ $.couch.app(function(app) {
       // save everything so we can destroy it all later
       app.wmdInstance = ({ta:textarea, div:previewDiv, ed:editor, pm:previewManager});
   
-      app.exposed = $('#post_form').expose({api: true, color: '#B9C7C9'}).load();
+      app.exposed = $('#post_form').expose({api: true, color: '#A3A6A8'}).load();
       app.exposed.onClose(app.destroyWmdInstance);
       $(window).scroll(app.exposed.fit);
   };
@@ -266,51 +264,37 @@ $.couch.app(function(app) {
 
         // add the attachment
         if (attachment){
-        
-          // Begin the wait-for-upload dialog
-          app.dialog_box.html('Please wait for your attachment to finish uploading.');
-          app.dialog_box.append('<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /></span>');
-          app.dialog_box.dialog('option', 'buttons', {
-              'cancel': function(){
-                $(this).dialog('close');
-                // Remove the doc that didn't get the attachment.
-                app.db.removeDoc(doc);
-              }
-          })
           
-          app.dialog_box.dialog('open');
+          // Begin the wait-for-upload dialog
+          $.blockUI({
+                message:    'Please wait for your attachment to finish uploading.'
+                          + '<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /></span>'
+                          + '<input id="dialog_button" type="button" value="cancel"/>'
+          });
+      
+          // If the user clicks cancel, then remove the original doc
+          $('#dialog_button').click(function(){
+            $.unblockUI();
+            app.db.removeDoc(doc);
+          })
 
+          // Submit #file_form
           $('#file_form INPUT[name=_rev]').val(resp.rev);
           var url = app.db.uri+resp.id;
-          console.log('url', url);
-          // Submit #file_form
           $('#file_form').ajaxSubmit({
               url: url
             , beforeSubmit: function(){
             }
             , complete: function(xhr){
-              console.log('Complete', xhr);
             }
             , error: function(a, b, c){
-              console.log('Error', c);
             }
             , success: function(resp){
               // resp ->  <pre>{"ok":true,"id":"<id>","rev":"<rev>"}</pre>
-              console.log(resp);
-              // Finish the wait-for-upload dialog
-              app.dialog_box.dialog('close');
-              
-              // make a trivial change to this doc to cause every connected browser to see the file is uploaded.
-              doc.date = new Date().getTime();
-              //app.db.saveDoc(doc);
-
+              $.unblockUI();
             }
           });
-          
-          $
-          
         };
-        
       }});
     });
   };
@@ -397,10 +381,10 @@ $.couch.app(function(app) {
 
     for (var i in app.thread.docs){
       var doc = app.thread.docs[i];
+      if (doc.attachment.pending){continue};
       
       // Find the new doc and insert it in the proper location,
-      if (! $('#'+doc._id).length ){
-        if (doc.has_attachment && !doc.attachment_html){continue}; // Skip it if it's a new doc with an attachment pending
+      if (! $('#'+doc._id).length){
         var html = template(app.doc_template, doc);
         // Stick the new doc in after the doc before it.
         var insertion_index = app.thread.docs.indexOf(doc) - 1;
@@ -421,7 +405,7 @@ $.couch.app(function(app) {
     app.index = new Index(json.rows);
     for (var i in app.index.docs){
       var doc = app.index.docs[i];
-      if (doc.has_attachment && !doc.attachment_html){continue}; // Skip it if it's a new doc with an attachment pending
+      if (doc.attachment.pending){continue};
       var html = template(app.row_template, doc);
       $('#wrapper').append(html);
     }

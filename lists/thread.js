@@ -25,8 +25,7 @@ function(head, req){
     send('<input type="hidden" name="thread_id" value="'+t.id+'" />');
     for (var i in t.docs){
         var doc = t.docs[i];
-        // Doc may have an attachment currently being uploaded, skip these.
-        if (doc.has_attachment && !doc.html){
+        if (doc.attachment_pending){
             continue
         }
         send(template(templates.doc,doc));
