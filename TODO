@@ -11,11 +11,8 @@ Full text search w/ Lucene
     http://wiki.apache.org/couchdb/Full_text_search
     http://github.com/rnewson/couchdb-lucene
     
-couchapp to load auth db?
-
-set width of preview to == width of wmd editor
-
 optimize as this is getting bulky.
+
 
 validate_doc_update
     Title length
