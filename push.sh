@@ -1,7 +1,7 @@
 #!/bin/sh
 cd fmr
 couchapp push
-cd ../auth
+cd ../_auth
 couchapp push
 cd ..
 

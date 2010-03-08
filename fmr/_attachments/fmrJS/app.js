@@ -58,7 +58,7 @@ $.couch.app(function(app) {
    * ****************************************************
    */
 
-  app.getTemplate = function(template_name, fn){
+  app.getTemplate = function(template_name){
     // Synchronously get a template from the design doc.
     //  We're doing this so we can use the same template here and on the server.
     var template;
@@ -67,7 +67,6 @@ $.couch.app(function(app) {
         , async: false
         , success: function(data){
           template = data.templates[template_name];
-          //fn(data.templates[template])
         }
         , dataType: 'json'
     });
@@ -81,6 +80,19 @@ $.couch.app(function(app) {
    * Session
    * ****************************************************
    */
+  
+  app.login = function(username, password){
+    $.couch.login({
+        name: username
+      , password: password
+      , success: function(resp){
+          app.session();
+      }
+      , error: function(status, error, reason){
+          app.modalMessage(reason);
+      }
+    })
+  };
 
   app.showLoggedIn = function(name){
       $('#username').html(name);
@@ -123,21 +135,105 @@ $.couch.app(function(app) {
 
   // Login Button
   $('INPUT[value=login]').click(function(){
-    if ($('[name=username]').val() && $('[name=password]').val()){
-      $.couch.login({
-          name: $('[name=username]').val()
-        , password: $('[name=password]').val()
-        , success: function(resp){
-            app.session();
-        }
-        , error: function(status, error, reason){
-            app.modalMessage(reason);
-        }
-      })
+    var username = $('[name=username]').val();
+    var password = $('[name=password]').val();
+    if (username && password){
+      app.login(username, password);
     } else {
       app.modalMessage('Please provide username and password.');
     }
   });
+
+  /**
+   * Signup
+   * 
+   * Borrows very heavily from Nymphormation:
+   * http://github.com/benoitc/nymphormation/blob/master/nymphormation/_attachments/js/nymphormation.js
+   * ****************************************************
+   */
+  function checkLength(o, n, min, max) {
+      if (o.val().length > max || o.val().length < min) {
+          o.addClass('ui-state-error');
+          updateTips("Length of " + n + " must be between " + min + " and " + max + ".");
+          return false;
+      } else {
+          return true;
+      }
+  }
+ 
+  function checkRegexp(o, regexp, n) {
+      if (! (regexp.test(o.val()))) {
+          o.addClass('ui-state-error');
+          updateTips(n);
+          return false;
+      } else {
+          return true;
+      }
+  }
+  function updateTips(t) {
+      $('#tips').text(t).fadeIn(1500);
+  }
+  $('#signup').click(function(){
+    var signup_form = app.getTemplate('signup');
+    $.blockUI({
+          message: signup_form
+        , overlayCSS: {
+            backgroundColor: '#A3A6A8'
+          } 
+    });
+
+    $('INPUT[value=signup]').click(function(){
+      app.signup();
+    });
+
+    $('#close_button').click(function(){
+      $.unblockUI();
+    });
+    
+  });
+  
+  app.signup = function() {
+    var bValid = true,
+        username = $("INPUT[name=signup_username]"),
+        email = $("INPUT[name=email]"),
+        password = $("INPUT[name=signup_password]"),
+        allFields = $([]).add(username).add(email).add(password);
+    
+    allFields.removeClass('ui-state-error');
+
+    bValid = bValid && checkLength(username, "username", 3, 16);
+    bValid = bValid && checkLength(password, "password", 5, 16);
+    bValid = bValid && checkLength(email, "email", 6, 80);
+    
+    bValid = bValid && checkRegexp(username, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter.");
+    bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
+	bValid = bValid && checkRegexp(email,/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,"This is not a valid email address.");
+    
+    if (bValid) {
+      var user = {
+        username: username.val(),
+        email: email.val(),
+        password: password.val(),
+        active: "true"
+      };
+      
+      $.ajax({
+        type: "POST",
+        url: "/_user",
+        data: user,
+        success: function(resp) {
+          app.login(username.val(), password.val());
+          $.unblockUI();
+        },
+        error: function(a,b,error) {
+          updateTips("Username already exist");
+        }
+      });
+      
+    }
+    return false;
+  };
+  
 
   /**
    * Dialog
@@ -149,12 +245,12 @@ $.couch.app(function(app) {
     $.blockUI({
           message:
                 '<p>'+message+'</p>'
-              + '<input id="dialog_button" type="button" value="ok">'
+              + '<div id="close_button"></div>'
         , overlayCSS: {
             backgroundColor: '#A3A6A8'
           } 
     });
-    $('#dialog_button').click(function(){
+    $('#close_button').click(function(){
       $.unblockUI();
     })
   }
@@ -272,15 +368,15 @@ $.couch.app(function(app) {
           // Begin the wait-for-upload dialog
           $.blockUI({
                 message:    'Please wait for your attachment to finish uploading.'
-                          + '<span class="attachment_pending"><img src="'+settings.root+'/img/spinner.gif" /></span>'
-                          + '<input id="dialog_button" type="button" value="cancel"/>'
+                          + '<img src="'+settings.root+'/img/spinner.gif" />'
+                          + '<div id="close_button"></div>'
           });
       
           // If the user clicks cancel, then remove the original doc
-          $('#dialog_button').click(function(){
+          $('#close_button').click(function(){
             $.unblockUI();
             app.db.removeDoc(doc);
-          })
+          });
 
           // Submit #file_form
           $('#file_form INPUT[name=_rev]').val(resp.rev);

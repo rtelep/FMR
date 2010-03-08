@@ -241,13 +241,17 @@ function Attachment(doc){
         
         // Create the full attachment object
         if (!Att.pending) {
+            try{console.log(Att);}catch(e){};
             Att.content_type = doc._attachments[Att.fn].content_type;
             Att.length = doc._attachments[Att.fn].length;
             Att.url = '/'+[settings.root.split('/')[1], doc._id, Att.fn].join('/');  // a hack
-            if (Att.content_type.split('/')[0] == 'image'){
+            var type = Att.content_type.split('/')[0];
+            if (type == 'image'){
                 Att.html = '<img class="attachment" src="'+Att.url+'" />';
-            } else {
-                Att.html = '<a href="'+ Att.url +'">attachment</a>'
+            } else if(type == 'audio'){
+                Att.html = '<span><a href="'+ Att.url +'">audio</a></span>'
+            } else if(type == 'video'){
+                Att.html = '<span><a href="'+ Att.url +'">video</a></span>'
             }
         }
     }
