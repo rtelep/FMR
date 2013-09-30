@@ -1,7 +1,7 @@
 #!/bin/sh
 cd fmr
-couchapp push
+erica push
 cd ../_auth
-couchapp push
+erica push
 cd ..
 
